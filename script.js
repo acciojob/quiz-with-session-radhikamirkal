@@ -4,25 +4,25 @@ const questionsElement = document.getElementById("questions");
 const submitBtn = document.getElementById("submit");
 const scoreDiv = document.getElementById("score");
 
-// 🔹 Load progress from sessionStorage
+// Load saved progress
 let userAnswers = JSON.parse(sessionStorage.getItem("progress")) || [];
 
-// 🔹 Restore saved score from localStorage
+// Restore score from localStorage
 const savedScore = localStorage.getItem("score");
 if (savedScore !== null) {
   scoreDiv.textContent = `Your score is ${savedScore} out of 5.`;
 }
 
-// 🔹 Save progress when selecting answers
+// Save progress on radio change
 document.addEventListener("change", function (e) {
   if (e.target.type === "radio") {
-    const questionIndex = parseInt(e.target.name.split("-")[1]);
-    userAnswers[questionIndex] = e.target.value;
+    const index = parseInt(e.target.name.split("-")[1]);
+    userAnswers[index] = e.target.value;
     sessionStorage.setItem("progress", JSON.stringify(userAnswers));
   }
 });
 
-// 🔹 Handle Submit
+// Handle submit
 submitBtn.addEventListener("click", function () {
   let score = 0;
 
@@ -33,7 +33,5 @@ submitBtn.addEventListener("click", function () {
   }
 
   scoreDiv.textContent = `Your score is ${score} out of 5.`;
-
-  // Save final score in localStorage
-  localStorage.setItem("score", score);
+  localStorage.setItem("score", score.toString());
 });
