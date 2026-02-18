@@ -4,16 +4,16 @@ const questionsElement = document.getElementById("questions");
 const submitBtn = document.getElementById("submit");
 const scoreDiv = document.getElementById("score");
 
-// Load saved progress
-let userAnswers = JSON.parse(sessionStorage.getItem("progress")) || [];
+// MUST be global and defined BEFORE renderQuestions()
+var userAnswers = JSON.parse(sessionStorage.getItem("progress")) || [];
 
-// Restore score from localStorage
+// Restore saved score
 const savedScore = localStorage.getItem("score");
 if (savedScore !== null) {
   scoreDiv.textContent = `Your score is ${savedScore} out of 5.`;
 }
 
-// Save progress on radio change
+// Save progress
 document.addEventListener("change", function (e) {
   if (e.target.type === "radio") {
     const index = parseInt(e.target.name.split("-")[1]);
@@ -22,7 +22,7 @@ document.addEventListener("change", function (e) {
   }
 });
 
-// Handle submit
+// Submit logic
 submitBtn.addEventListener("click", function () {
   let score = 0;
 
