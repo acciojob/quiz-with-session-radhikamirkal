@@ -1,81 +1,50 @@
-const questionsData = [
-  {
-    question: "Capital of India?",
-    options: ["Mumbai", "Delhi", "Chennai", "Kolkata"],
-    answer: "Delhi"
-  },
-  {
-    question: "2 + 2 = ?",
-    options: ["3", "4", "5", "6"],
-    answer: "4"
-  },
-  {
-    question: "HTML stands for?",
-    options: [
-      "Hyper Text Markup Language",
-      "High Text Machine Language",
-      "Hyperlinks Text Mark Language",
-      "None"
-    ],
-    answer: "Hyper Text Markup Language"
-  },
-  {
-    question: "JS is used for?",
-    options: ["Styling", "Structure", "Logic", "Database"],
-    answer: "Logic"
-  },
-  {
-    question: "CSS stands for?",
-    options: [
-      "Cascading Style Sheets",
-      "Creative Style System",
-      "Computer Style Sheets",
-      "Color Style Sheets"
-    ],
-    answer: "Cascading Style Sheets"
-  }
-];
-
 const questionsContainer = document.getElementById("questions");
 const submitBtn = document.getElementById("submit");
 const scoreDiv = document.getElementById("score");
 
-
-// 👉 Load progress from sessionStorage
+// Load session progress
 let progress = JSON.parse(sessionStorage.getItem("progress")) || {};
 
 
-// =======================
+// ======================
 // Render questions
-// =======================
-questionsData.forEach((q, qIndex) => {
+// ======================
+questions.forEach((q, qIndex) => {
   const qDiv = document.createElement("div");
 
   const title = document.createElement("p");
   title.textContent = q.question;
   qDiv.appendChild(title);
 
-  q.options.forEach(option => {
+  q.choices.forEach(choice => {
     const label = document.createElement("label");
 
     const radio = document.createElement("input");
     radio.type = "radio";
     radio.name = `question-${qIndex}`;
-    radio.value = option;
+    radio.value = choice;
 
-    // 👉 Restore checked state after refresh
-    if (progress[qIndex] === option) {
+    // Restore checked with ATTRIBUTE (important for Cypress)
+    if (progress[qIndex] === choice) {
       radio.checked = true;
+      radio.setAttribute("checked", "true");
     }
 
-    // 👉 Save progress to sessionStorage
+    // Save progress
     radio.addEventListener("change", () => {
-      progress[qIndex] = option;
+      progress[qIndex] = choice;
       sessionStorage.setItem("progress", JSON.stringify(progress));
+
+      // Remove checked attribute from siblings
+      document
+        .querySelectorAll(`input[name="question-${qIndex}"]`)
+        .forEach(el => el.removeAttribute("checked"));
+
+      radio.setAttribute("checked", "true");
     });
 
     label.appendChild(radio);
-    label.append(option);
+    label.append(choice);
     qDiv.appendChild(label);
     qDiv.appendChild(document.createElement("br"));
   });
@@ -84,29 +53,25 @@ questionsData.forEach((q, qIndex) => {
 });
 
 
-// =======================
-// Show stored score if exists
-// =======================
+// ======================
+// Restore score
+// ======================
 const storedScore = localStorage.getItem("score");
 if (storedScore !== null) {
   scoreDiv.textContent = `Your score is ${storedScore} out of 5.`;
 }
 
 
-// =======================
+// ======================
 // Submit logic
-// =======================
+// ======================
 submitBtn.addEventListener("click", () => {
   let score = 0;
 
-  questionsData.forEach((q, index) => {
-    if (progress[index] === q.answer) {
-      score++;
-    }
+  questions.forEach((q, index) => {
+    if (progress[index] === q.answer) score++;
   });
 
   scoreDiv.textContent = `Your score is ${score} out of 5.`;
-
-  // 👉 Store in localStorage
   localStorage.setItem("score", score);
 });
