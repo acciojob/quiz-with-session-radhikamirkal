@@ -2,14 +2,17 @@ const questionsContainer = document.getElementById("questions");
 const submitBtn = document.getElementById("submit");
 const scoreDiv = document.getElementById("score");
 
-// Load session progress
+// Convert questions object → array
+const qArr = Object.values(questions);
+
+// Load progress
 let progress = JSON.parse(sessionStorage.getItem("progress")) || {};
 
 
-// ======================
+// =======================
 // Render questions
-// ======================
-questions.forEach((q, qIndex) => {
+// =======================
+qArr.forEach((q, qIndex) => {
   const qDiv = document.createElement("div");
 
   const title = document.createElement("p");
@@ -24,18 +27,17 @@ questions.forEach((q, qIndex) => {
     radio.name = `question-${qIndex}`;
     radio.value = choice;
 
-    // Restore checked with ATTRIBUTE (important for Cypress)
+    // restore checked
     if (progress[qIndex] === choice) {
       radio.checked = true;
       radio.setAttribute("checked", "true");
     }
 
-    // Save progress
+    // save progress
     radio.addEventListener("change", () => {
       progress[qIndex] = choice;
       sessionStorage.setItem("progress", JSON.stringify(progress));
 
-      // Remove checked attribute from siblings
       document
         .querySelectorAll(`input[name="question-${qIndex}"]`)
         .forEach(el => el.removeAttribute("checked"));
@@ -53,22 +55,22 @@ questions.forEach((q, qIndex) => {
 });
 
 
-// ======================
+// =======================
 // Restore score
-// ======================
+// =======================
 const storedScore = localStorage.getItem("score");
 if (storedScore !== null) {
   scoreDiv.textContent = `Your score is ${storedScore} out of 5.`;
 }
 
 
-// ======================
-// Submit logic
-// ======================
+// =======================
+// Submit
+// =======================
 submitBtn.addEventListener("click", () => {
   let score = 0;
 
-  questions.forEach((q, index) => {
+  qArr.forEach((q, index) => {
     if (progress[index] === q.answer) score++;
   });
 
