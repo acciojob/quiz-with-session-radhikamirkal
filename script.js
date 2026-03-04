@@ -41,13 +41,11 @@ const questionsContainer = document.getElementById("questions");
 const submitBtn = document.getElementById("submit");
 const scoreDiv = document.getElementById("score");
 
-const qArr = [];
-for (let key in questions) {
-  qArr.push(questions[key]);
-}
+const qArr = Object.keys(questions).map(k => questions[k]);
 
 let progress = JSON.parse(sessionStorage.getItem("progress")) || {};
 
+// Render questions
 qArr.forEach((q, qIndex) => {
 
   const qDiv = document.createElement("div");
@@ -95,12 +93,7 @@ qArr.forEach((q, qIndex) => {
 
 });
 
-const storedScore = localStorage.getItem("score");
-
-if (storedScore !== null) {
-  scoreDiv.textContent = `Your score is ${storedScore} out of 5.`;
-}
-
+// Submit quiz
 submitBtn.addEventListener("click", () => {
 
   let score = 0;
