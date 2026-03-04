@@ -1,84 +1,108 @@
-const questionsContainer = document.getElementById("questions");
-const submitBtn = document.getElementById("submit");
-const scoreDiv = document.getElementById("score");
+const questions = {
+  0: {
+    question: "What is the highest mountain in the world?",
+    choices: ["Everest", "K2", "Kangchenjunga", "Lhotse"],
+    answer: "Everest"
+  },
+  1: {
+    question: "Which planet is known as the Red Planet?",
+    choices: ["Earth", "Mars", "Jupiter", "Venus"],
+    answer: "Mars"
+  },
+  2: {
+    question: "Who wrote Hamlet?",
+    choices: ["Shakespeare", "Dickens", "Hemingway", "Tolkien"],
+    answer: "Shakespeare"
+  },
+  3: {
+    question: "What is the capital of Japan?",
+    choices: ["Beijing", "Seoul", "Tokyo", "Bangkok"],
+    answer: "Tokyo"
+  },
+  4: {
+    question: "Which gas do plants absorb from the atmosphere?",
+    choices: ["Oxygen", "Carbon Dioxide", "Nitrogen", "Hydrogen"],
+    answer: "Carbon Dioxide"
+  }
+};
+window.onload = function () {
 
-// Convert questions object → array
-const qArr = Object.values(questions);
+  const questionsContainer = document.getElementById("questions");
+  const submitBtn = document.getElementById("submit");
+  const scoreDiv = document.getElementById("score");
 
-// Load progress from sessionStorage
-let progress = JSON.parse(sessionStorage.getItem("progress")) || {};
+  const qArr = Object.values(questions);
 
-// =======================
-// Render Questions
-// =======================
+  let progress = JSON.parse(sessionStorage.getItem("progress")) || {};
 
-qArr.forEach((q, qIndex) => {
-  const qDiv = document.createElement("div");
+  // Render questions
+  qArr.forEach((q, qIndex) => {
 
-  const title = document.createElement("p");
-  title.textContent = q.question;
-  qDiv.appendChild(title);
+    const qDiv = document.createElement("div");
 
-  q.choices.forEach(choice => {
-    const label = document.createElement("label");
+    const title = document.createElement("p");
+    title.textContent = q.question;
+    qDiv.appendChild(title);
 
-    const radio = document.createElement("input");
-    radio.type = "radio";
-    radio.name = `question-${qIndex}`;
-    radio.value = choice;
+    q.choices.forEach(choice => {
 
-    // restore checked state
-    if (progress[qIndex] === choice) {
-      radio.checked = true;
-      radio.setAttribute("checked", "true");
-    }
+      const label = document.createElement("label");
 
-    // save progress
-    radio.addEventListener("change", () => {
-      progress[qIndex] = radio.value;
-      sessionStorage.setItem("progress", JSON.stringify(progress));
+      const radio = document.createElement("input");
+      radio.type = "radio";
+      radio.name = `question-${qIndex}`;
+      radio.value = choice;
 
-      document
-        .querySelectorAll(`input[name="question-${qIndex}"]`)
-        .forEach(el => el.removeAttribute("checked"));
+      if (progress[qIndex] === choice) {
+        radio.checked = true;
+        radio.setAttribute("checked", "true");
+      }
 
-      radio.setAttribute("checked", "true");
+      radio.addEventListener("change", () => {
+
+        progress[qIndex] = radio.value;
+        sessionStorage.setItem("progress", JSON.stringify(progress));
+
+        document
+          .querySelectorAll(`input[name="question-${qIndex}"]`)
+          .forEach(el => el.removeAttribute("checked"));
+
+        radio.setAttribute("checked", "true");
+
+      });
+
+      label.appendChild(radio);
+      label.append(choice);
+
+      qDiv.appendChild(label);
+      qDiv.appendChild(document.createElement("br"));
+
     });
 
-    label.appendChild(radio);
-    label.append(choice);
+    questionsContainer.appendChild(qDiv);
 
-    qDiv.appendChild(label);
-    qDiv.appendChild(document.createElement("br"));
   });
 
-  questionsContainer.appendChild(qDiv);
-});
+  // restore score
+  const storedScore = localStorage.getItem("score");
 
-// =======================
-// Restore score
-// =======================
+  if (storedScore !== null) {
+    scoreDiv.textContent = `Your score is ${storedScore} out of 5.`;
+  }
 
-const storedScore = localStorage.getItem("score");
+  // submit quiz
+  submitBtn.addEventListener("click", () => {
 
-if (storedScore !== null) {
-  scoreDiv.textContent = `Your score is ${storedScore} out of 5.`;
-}
+    let score = 0;
 
-// =======================
-// Submit Quiz
-// =======================
+    qArr.forEach((q, index) => {
+      if (progress[index] === q.answer) score++;
+    });
 
-submitBtn.addEventListener("click", () => {
-  let score = 0;
+    scoreDiv.textContent = `Your score is ${score} out of 5.`;
 
-  qArr.forEach((q, index) => {
-    if (progress[index] === q.answer) {
-      score++;
-    }
+    localStorage.setItem("score", score);
+
   });
 
-  scoreDiv.textContent = `Your score is ${score} out of 5.`;
-
-  localStorage.setItem("score", score);
-});
+};
